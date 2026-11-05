@@ -1,0 +1,11 @@
+{
+    "markdown.styles": [
+        ".vscode/markdown-preview.css"
+    ],
+    "python.terminal.useEnvFile": true,
+    "go.formatTool": "gofmt",
+    "[go]": {
+        "editor.defaultFormatter": "golang.go",
+        "editor.formatOnSave": true
+    }
+}

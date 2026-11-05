@@ -1,0 +1,106 @@
+# Deployment settings are literal values here; .env is for local development only.
+# Keep environment names, sample values, order and descriptions aligned with .env.example.
+services:
+  lark-feishu-chatbot:
+    # Name this bot container explicitly.
+    container_name: lark-feishu-chatbot
+    # Build this image with the Dockerfile before starting the Compose service.
+    image: lark-feishu-chatbot:local
+    # Restart after failures and Docker daemon restarts.
+    restart: always
+    # Publish locally behind a reverse proxy; change the host address for direct HTTPS.
+    ports:
+      # The container port must match HTTP_ADDR; this port serves HTTP or HTTPS.
+      - "127.0.0.1:9000:9000"
+    # Persist application JSON logs in the host logs directory.
+    volumes:
+      - ./logs:/app/logs
+    # Application settings come only from the environment; no YAML config is mounted.
+    environment:
+      # Listener address for HTTP or HTTPS; match the container port published by Docker.
+      HTTP_ADDR: ":9000"
+      # Positive Go duration for reading callback headers/bodies and idle HTTP connections.
+      HTTP_READ_TIMEOUT: "10s"
+      # Positive Go duration for callback responses, Feishu API calls and card writes.
+      HTTP_WRITE_TIMEOUT: "15s"
+      # Positive Go duration for application shutdown; allow sufficient container stop time.
+      SHUTDOWN_TIMEOUT: "15s"
+      # Enable direct HTTPS on HTTP_ADDR; false uses plain HTTP behind a TLS reverse proxy.
+      USE_HTTPS: "false"
+      # PEM certificate/chain path, required for HTTPS; mount the certs directory read-only.
+      CERT_FILE: "certs/server.crt"
+      # PEM private-key path, required for HTTPS; the container user must be able to read it.
+      KEY_FILE: "certs/server.key"
+
+      # Required Feishu application ID; replace the example placeholder.
+      FEISHU_APP_ID: "replace-me"
+      # Required Feishu application secret; replace the example placeholder.
+      FEISHU_APP_SECRET: "replace-me"
+      # Required callback verification token from the Feishu app console.
+      FEISHU_VERIFICATION_TOKEN: "replace-me"
+      # Callback encryption key; empty permits plaintext callbacks authenticated by token.
+      FEISHU_ENCRYPT_KEY: ""
+      # Exact bot display name used to identify mentions in group messages.
+      FEISHU_BOT_NAME: "Lark-Feishu-Chatbot"
+
+      # Model protocol: chat-completions, responses or anthropic-messages.
+      LLM_API_TYPE: "chat-completions"
+      # HTTP(S) model base URL including any version prefix; only the resource path is appended.
+      LLM_BASE_URL: "https://api.deepseek.com"
+      # Required model API key; replace the example placeholder.
+      LLM_API_KEY: "replace-me"
+      # Exact model ID supported by the selected endpoint and protocol.
+      LLM_MODEL: "deepseek-flash"
+      # Positive maximum output-token count sent to the model provider.
+      LLM_MAX_OUTPUT_TOKENS: "2048"
+      # Optional number from 0 to 2; empty omits temperature for models that reject it.
+      LLM_TEMPERATURE: ""
+      # Optional system instruction; empty sends no system instruction.
+      LLM_SYSTEM_PROMPT: ""
+      # API version header required for anthropic-messages; ignored by other protocols.
+      LLM_ANTHROPIC_VERSION: "2023-06-01"
+      # Optional HTTP(S) proxy for model traffic only; empty uses a direct connection.
+      LLM_PROXY_URL: ""
+
+      # Positive Go duration limiting one admitted request, including initial card creation.
+      REQUEST_TIMEOUT: "120s"
+      # Positive Go duration without visible model text before cancellation; includes first-text wait.
+      STREAM_IDLE_TIMEOUT: "30s"
+      # Positive maximum number of background workers, including workers sending notices.
+      MAX_CONCURRENT_REQUESTS: "8"
+
+      # Positive Go duration retaining successful topic history after its last successful turn.
+      SESSION_TTL: "12h"
+      # Positive topic capacity; the oldest inactive topic may be evicted when full.
+      SESSION_MAX_COUNT: "1000"
+      # Maximum retained history messages, at least 2; oldest complete pairs are trimmed.
+      HISTORY_MAX_MESSAGES: "40"
+      # Positive Unicode-rune budget for history/input and each answer; this is not a token count.
+      HISTORY_MAX_RUNES: "24000"
+      # Positive Go duration suppressing repeated deliveries of the same message ID.
+      DEDUPE_TTL: "30m"
+      # Positive maximum number of unexpired deduplication IDs; full capacity rejects admission.
+      DEDUPE_MAX_COUNT: "10000"
+
+      # Enable per-user quotas and quota-user tracking; false bypasses both quotas.
+      ACCESS_CONTROL_ENABLE: "true"
+      # Model attempts per user in a rolling minute; 0 disables this quota.
+      RATE_LIMIT_PER_MINUTE: "20"
+      # Model attempts per user per UTC day; 0 disables this quota; failures still count.
+      RATE_LIMIT_PER_DAY: "200"
+      # Positive maximum number of tracked quota users; full capacity rejects new users.
+      RATE_LIMIT_MAX_USERS: "10000"
+
+      # Positive Go duration between progressive card refreshes; terminal updates are immediate.
+      CARD_UPDATE_INTERVAL: "1s"
+      # Markdown text-rune ceiling per card, at least 128; long answers use continuation cards.
+      CARD_MAX_RUNES: "6000"
+
+      # Enable file logging for both commands to LOG_FILE alongside stdout; false keeps stdout only.
+      ENABLE_LOG: "true"
+      # Minimum application log level: debug, info, warn or error; logs go to stdout as JSON.
+      LOG_LEVEL: "info"
+      # Explicit boolean; true includes user inputs and replies in terminal/file logs, false omits them.
+      LOG_CONTENT: "true"
+      # JSON log-file path required when ENABLE_LOG=true; relative paths use the working directory.
+      LOG_FILE: "logs/chatbot.log"

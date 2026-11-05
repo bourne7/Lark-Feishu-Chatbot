@@ -1,0 +1,199 @@
+/*
+ * Workspace Markdown preview theme
+ *
+ * Design goals:
+ * 1) Distinguish headings, body text, code, quotes and tables at a glance.
+ * 2) Keep long documents readable with balanced contrast, spacing and line height.
+ * 3) Centralize colors in CSS variables so themes can be adjusted in :root.
+ *
+ * The default variables apply to light system and VS Code themes.
+ * Adjust these values first when primarily using a light theme.
+ */
+:root {
+    /* Use dark gray for body text and lists to reduce visual fatigue. */
+    --md-fg: #1f2937;
+    /* Use muted text for quotes and secondary information. */
+    --md-muted: #475569;
+    /* Use a soft background for quotes and callouts. */
+    --md-bg-soft: #f8fafc;
+    /* Share a border color across tables and separators. */
+    --md-border: #e2e8f0;
+
+    /* Distinguish H1, H2 and H3 with separate hues. */
+    --md-h1: #0f766e;
+    --md-h2: #0b5ed7;
+    --md-h3: #7c3aed;
+    --md-h1-border: #99f6e4;
+    --md-h2-border: #93c5fd;
+
+    /* Link and inline code colors. */
+    --md-link: #2563eb;
+    --md-inline-code-fg: #b91c1c;
+    --md-inline-code-bg: #f3f4f6;
+
+    /* Code block, table header and quote accent colors. */
+    --md-block-code-bg: #111827;
+    --md-block-code-fg: #e5e7eb;
+    --md-quote-border: #60a5fa;
+    --md-table-head-bg: #eef2ff;
+    --md-table-head-fg: #3730a3;
+}
+
+/*
+ * Dark theme overrides:
+ * - Apply automatically when the system or VS Code preview uses a dark scheme.
+ * - Keep text bright enough to remain distinct from dark backgrounds.
+ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Brighten primary and secondary text for long documents. */
+        --md-fg: #e5e7eb;
+        --md-muted: #cbd5e1;
+
+        /* Use dark container backgrounds and borders. */
+        --md-bg-soft: #0f172a;
+        --md-border: #334155;
+
+        /* Brighten heading colors against dark backgrounds. */
+        --md-h1: #5eead4;
+        --md-h2: #93c5fd;
+        --md-h3: #c4b5fd;
+        --md-h1-border: #2dd4bf;
+        --md-h2-border: #60a5fa;
+
+        /* Adjust links and inline code for the dark theme. */
+        --md-link: #60a5fa;
+        --md-inline-code-fg: #fca5a5;
+        --md-inline-code-bg: #1f2937;
+
+        /* Preserve contrast in code blocks and table headers. */
+        --md-block-code-bg: #020617;
+        --md-block-code-fg: #e2e8f0;
+        --md-quote-border: #38bdf8;
+        --md-table-head-bg: #1e293b;
+        --md-table-head-fg: #e0e7ff;
+    }
+}
+
+body {
+    /*
+   * Prefer the workspace font, then Windows UI and multilingual fallbacks.
+   * Segoe UI provides consistent interface text on Windows.
+   * Platform font fallbacks preserve readability for international content.
+   */
+    font-family: "Maple Mono NF", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    /* Use a line height of 1.75 for comfortable long-form reading. */
+    line-height: 1.75;
+    /* Read the foreground color from the active theme variables. */
+    color: var(--md-fg);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    /* Keep headings bold across themes and fonts. */
+    font-weight: 700;
+    /* Slightly increase heading letter spacing. */
+    letter-spacing: 0.01em;
+}
+
+h1 {
+    /* Use teal to identify top-level sections. */
+    color: var(--md-h1);
+    /* Separate top-level sections with a bottom border. */
+    border-bottom: 2px solid var(--md-h1-border);
+    padding-bottom: 6px;
+}
+
+h2 {
+    /* Use blue to distinguish second-level headings. */
+    color: var(--md-h2);
+    /* A left accent makes second-level headings easier to scan. */
+    border-left: 4px solid var(--md-h2-border);
+    padding-left: 10px;
+}
+
+h3 {
+    /* Give third-level headings a distinct color. */
+    color: var(--md-h3);
+}
+
+a {
+    /* Hide link underlines by default to reduce visual clutter. */
+    color: var(--md-link);
+    text-decoration: none;
+}
+
+a:hover {
+    /* Restore the underline on hover to indicate interactivity. */
+    text-decoration: underline;
+}
+
+p,
+li {
+    /* Keep paragraph and list colors consistent. */
+    color: var(--md-fg);
+}
+
+code {
+    /* Highlight inline code with a contrasting background and warm text. */
+    background: var(--md-inline-code-bg);
+    color: var(--md-inline-code-fg);
+    padding: 2px 6px;
+    /* Soften inline code backgrounds with rounded corners. */
+    border-radius: 6px;
+}
+
+pre code {
+    /*
+   * Code blocks:
+   * - Use bright text on a dark background to distinguish code.
+   * - Block layout and padding provide reading space.
+   */
+    display: block;
+    background: var(--md-block-code-bg);
+    color: var(--md-block-code-fg);
+    padding: 14px;
+    border-radius: 10px;
+    /* Scroll wide code horizontally without breaking the page layout. */
+    overflow-x: auto;
+}
+
+blockquote {
+    /* Distinguish supplementary quotes with a background and left accent. */
+    margin: 1rem 0;
+    padding: 0.6rem 1rem;
+    background: var(--md-bg-soft);
+    border-left: 4px solid var(--md-quote-border);
+    /* Mute quotes so they do not compete with body text. */
+    color: var(--md-muted);
+}
+
+table {
+    /* Collapse adjacent table borders to avoid double lines. */
+    border-collapse: collapse;
+    /* Keep tables aligned with the full content width. */
+    width: 100%;
+}
+
+th,
+td {
+    /* Use consistent cell borders and padding for readability. */
+    border: 1px solid var(--md-border);
+    padding: 8px 10px;
+}
+
+th {
+    /* Give table headers contrasting text and backgrounds. */
+    background: var(--md-table-head-bg);
+    color: var(--md-table-head-fg);
+}
+
+hr {
+    /* Use a subtle border color for horizontal separators. */
+    border: 0;
+    border-top: 1px solid var(--md-border);
+}

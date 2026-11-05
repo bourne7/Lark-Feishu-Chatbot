@@ -1,0 +1,20 @@
+# Local credentials and development artifacts.
+.env
+/.env/
+.env.*
+!.env.example
+*.pem
+*.key
+*.exe
+*.test
+*.out
+/bin/
+/coverage/
+/logs/
+/certs/
+/ignore/
+/.superpowers/
+/.idea/
+.DS_Store
+go.work
+go.work.sum
